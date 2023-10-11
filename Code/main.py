@@ -8,31 +8,6 @@ import pandas as pd
 import numpy as np
 import tensorflow as tf
 
-context_tokenizer = Tokenizer()
-
-csv = pd.read_csv('reviews_data.csv')
-
-Reviews = csv['Review']
-Ratings = csv['Rating']
-
-max_seq_len = max([len(x) for x in Reviews])
-print(max_seq_len)
-
-context_tokenizer.fit_on_texts(Reviews)
-
-X_train = []
-Y_train = []
-
-for i in range(len(Reviews)):
-    rev = context_tokenizer.texts_to_sequences([Reviews[i]])
-    rev = pad_sequences(rev, maxlen=max_seq_len)
-    X_train.append([rev, Ratings[i]])
-
-for i in range(len(Reviews)):
-    rev = context_tokenizer.texts_to_sequences([Reviews[i]])
-    rev = pad_sequences(rev, maxlen=max_seq_len)
-    Y_train.append(rev)
-
 class FeedForwardNetwork(Layer):
     def __init__(self, units):
         super().__init__()
@@ -113,9 +88,6 @@ class Encoder(Layer):
             x = layer(x)
 
         return x
-
-enc =  Encoder(256, 5000, 256, 4, num_layer=2)
-print(enc(np.array([[12, 24, 34], [58, 230, 400]])))
 
 class MaskedMultiHeadedAttention(Layer):
     def __init__(self, num_head, units):
@@ -203,9 +175,3 @@ num_heads = 4
 num_layers = 5
 
 transformer = Transformer(units, vocab_size, d_model, num_heads, num_layers)
-print(X_train)
-
-print(X_train.shape)
-print(Y_train.shape)
-
-transformer((X_train, Y_train))
